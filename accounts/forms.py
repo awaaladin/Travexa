@@ -38,3 +38,14 @@ class CustomLoginForm(AuthenticationForm):
 UserCreationForm helps with registration and AuthenticationForm helps with login.
 
 Bootstrap form-control classes are added to make the forms look cleaner and consistent with Bootstrap UI styling."""
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'password1', 'password2', 'role']
+
+class CustomLoginForm(AuthenticationForm):
+    username = forms.CharField(label="Username", max_length=100)
+    password = forms.CharField(label="Password", widget=forms.PasswordInput)
+
+

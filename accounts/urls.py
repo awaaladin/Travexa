@@ -1,20 +1,15 @@
-# Import the 'path' function which is used to define URL patterns.
 from django.urls import path
-
-# Import the views module from the current directory ('.') to connect URLs to view functions.
 from . import views
 
-# Define a list of URL patterns for the app.
 urlpatterns = [
-    # When the user visits /register/, Django will call the register_view function in views.py.
-    # The 'name' parameter allows you to refer to this URL in templates using {% url 'register' %}.
-    path('register/', views.register_view, name='register'),
-
-    # When the user visits /login/, Django will call the login_view function.
-    # You can reference this URL with {% url 'login' %}.
-    path('login/', views.login_view, name='login'),
-
-    # When the user visits /logout/, Django will call the logout_view function.
-    # Use {% url 'logout' %} in templates to link to this URL.
-    path('logout/', views.logout_view, name='logout'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('users/', views.user_list, name='user_list'),
+    path('tours/', views.tour_list, name='tour_list'),
+    path('bookings/', views.booking_list, name='booking_list'),
+    path('payments/', views.payment_list, name='payment_list'),
+    path('reviews/', views.review_list, name='review_list'),
+    path('reports/', views.report_view, name='report_view'),
+    path('settings/', views.settings_view, name='settings'),
+    path('login/', LoginView.as_view(), name='login'),  # Add this line for login
+    path('logout/', LogoutView.as_view(), name='logout')
 ]

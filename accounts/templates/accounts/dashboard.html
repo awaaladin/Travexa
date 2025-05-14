@@ -1,0 +1,1160 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% extends 'base.html' %}
+
+{% block title %}
+Travexa Admin Dashboard
+{% endblock %}
+
+{% block content %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travexa Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --success: #06d6a0;
+            --danger: #ef476f;
+            --warning: #ffd166;
+            --info: #118ab2;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #adb5bd;
+            --sidebar-width: 250px;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--dark) 0%, #343a40 100%);
+            color: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar .logo {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .logo img {
+            height: 40px;
+        }
+        
+        .sidebar-menu {
+            padding: 0;
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .sidebar-menu li a i {
+            margin-right: 10px;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 10px 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            padding-left: 40px;
+            border-radius: 50px;
+            border: 1px solid #e9ecef;
+            padding: 10px 20px 10px 45px;
+            width: 300px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: var(--gray);
+        }
+        
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-stats {
+            padding: 15px;
+        }
+        
+        .card-stats .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .card-stats .stats {
+            flex: 1;
+        }
+        
+        .card-stats .stats h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .card-stats .stats p {
+            margin: 0;
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #63a4ff 100%);
+        }
+        
+        .bg-gradient-success {
+            background: linear-gradient(135deg, var(--success) 0%, #4edcbd 100%);
+        }
+        
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #ffe08a 100%);
+        }
+        
+        .bg-gradient-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #ff7c98 100%);
+        }
+        
+        /* Tables */
+        .table {
+            font-size: 15px;
+        }
+        
+        .table thead th {
+            border-top: none;
+            border-bottom: 2px solid #e9ecef;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .table tbody td {
+            vertical-align: middle;
+            padding: 15px 10px;
+            border-color: #e9ecef;
+        }
+        
+        .table .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background-color: rgba(255, 209, 102, 0.2);
+            color: var(--warning);
+        }
+        
+        .status-confirmed {
+            background-color: rgba(6, 214, 160, 0.2);
+            color: var(--success);
+        }
+        
+        .status-cancelled {
+            background-color: rgba(239, 71, 111, 0.2);
+            color: var(--danger);
+        }
+        
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 5px;
+            color: white;
+        }
+        
+        .btn-view {
+            background-color: var(--info);
+        }
+        
+        .btn-edit {
+            background-color: var(--warning);
+        }
+        
+        .btn-delete {
+            background-color: var(--danger);
+        }
+        
+        /* Charts */
+        .chart-container {
+            position: relative;
+            min-height: 300px;
+        }
+        
+        /* Tour listing */
+        .tour-item {
+            border-bottom: 1px solid #e9ecef;
+            padding: 15px 0;
+        }
+        
+        .tour-item:last-child {
+            border-bottom: none;
+        }
+        
+        .tour-item .tour-image {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        
+        .tour-item .tour-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .tour-item .tour-details {
+            font-size: 13px;
+            color: var(--gray);
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h2 class="mb-0 d-flex align-items-center">
+                <i class="fas fa-globe-americas me-2"></i>
+                <span>Travexa</span>
+            </h2>
+        </div>
+        <ul class="sidebar-menu mt-4">
+            <li>
+                <a href="#dashboard" class="active" data-bs-toggle="tab" role="tab" aria-controls="dashboard" aria-selected="true">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#users" data-bs-toggle="tab" role="tab" aria-controls="users" aria-selected="false">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="#tours" data-bs-toggle="tab" role="tab" aria-controls="tours" aria-selected="false">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>Tours</span>
+                </a>
+            </li>
+            <li>
+                <a href="#bookings" data-bs-toggle="tab" role="tab" aria-controls="bookings" aria-selected="false">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Bookings</span>
+                </a>
+            </li>
+            <li>
+                <a href="#payments" data-bs-toggle="tab" role="tab" aria-controls="payments" aria-selected="false">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Payments</span>
+                </a>
+            </li>
+            <li>
+                <a href="#reviews" data-bs-toggle="tab" role="tab" aria-controls="reviews" aria-selected="false">
+                    <i class="fas fa-star"></i>
+                    <span>Reviews</span>
+                </a>
+            </li>
+            <li>
+                <a href="#reports" data-bs-toggle="tab" role="tab" aria-controls="reports" aria-selected="false">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            <li>
+                <a href="#settings" data-bs-toggle="tab" role="tab" aria-controls="settings" aria-selected="false">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <div class="navbar d-flex justify-content-between">
+            <div class="d-flex align-items-center">
+                <button class="btn d-lg-none" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="search-box ms-3">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Search...">
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="dropdown me-3">
+                    <a href="#" class="position-relative text-dark" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell fa-lg"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            3
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
+                        <li><a class="dropdown-item" href="#">New tour approval request</a></li>
+                        <li><a class="dropdown-item" href="#">New user registration</a></li>
+                        <li><a class="dropdown-item" href="#">Payment dispute raised</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="user-profile me-2">
+                            <img src="/api/placeholder/40/40" alt="Admin">
+                        </div>
+                        <div>
+                            <p class="mb-0 fw-bold">Admin User</p>
+                            <small class="text-muted">Administrator</small>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Dashboard Tab -->
+            <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                <div class="container-fluid px-0">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h1 class="fw-bold">Dashboard</h1>
+                            <p class="text-muted">Welcome back, Admin! Here's what's happening with Travexa today.</p>
+                        </div>
+                    </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-stats d-flex align-items-center">
+                                <div class="icon bg-gradient-primary text-white">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stats">
+                                    <h3>{{ total_users }}</h3>
+                                    <p>Total Users</p>
+                                </div>
+                            </div>
+                            <div class="progress mt-3" style="height: 5px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-2 mb-0 text-muted small">
+                                <i class="fas fa-arrow-up text-success me-1"></i>
+                                <span class="text-success fw-bold">12%</span> increase this month
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-stats d-flex align-items-center">
+                                <div class="icon bg-gradient-success text-white">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                </div>
+                                <div class="stats">
+                                    <h3>{{ active_tours }}</h3>
+                                    <p>Active Tours</p>
+                                </div>
+                            </div>
+                            <div class="progress mt-3" style="height: 5px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-2 mb-0 text-muted small">
+                                <i class="fas fa-arrow-up text-success me-1"></i>
+                                <span class="text-success fw-bold">8%</span> increase this month
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-stats d-flex align-items-center">
+                                <div class="icon bg-gradient-warning text-white">
+                                    <i class="fas fa-ticket-alt"></i>
+                                </div>
+                                <div class="stats">
+                                    <h3>{{ total_bookings }}</h3>
+                                    <p>Bookings</p>
+                                </div>
+                            </div>
+                            <div class="progress mt-3" style="height: 5px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-2 mb-0 text-muted small">
+                                <i class="fas fa-arrow-up text-success me-1"></i>
+                                <span class="text-success fw-bold">15%</span> increase this month
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-stats d-flex align-items-center">
+                                <div class="icon bg-gradient-danger text-white">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <div class="stats">
+                                    <h3>{{ total_revenue }}</h3>
+                                    <p>Revenue</p>
+                                </div>
+                            </div>
+                            <div class="progress mt-3" style="height: 5px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-2 mb-0 text-muted small">
+                                <i class="fas fa-arrow-up text-success me-1"></i>
+                                <span class="text-success fw-bold">23%</span> increase this month
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Bookings Table -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title fw-bold mb-0">Recent Bookings</h5>
+                                <a href="#" class="btn btn-sm btn-primary">View All</a>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Tour</th>
+                                            <th>Date</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+    {% for booking in recent_bookings %}
+    <tr>
+        <td>{{ booking.user.username }}</td>
+        <td>{{ booking.tour.name }}</td>
+        <td>{{ booking.date }}</td>
+        <td>${{ booking.amount }}</td>
+        <td><span class="status status-{{ booking.status|lower }}">{{ booking.status|title }}</span></td>
+        <td>
+            <a href="#" class="btn btn-action btn-view"><i class="fas fa-eye"></i></a>
+            <a href="#" class="btn btn-action btn-edit"><i class="fas fa-edit"></i></a>
+            <a href="#" class="btn btn-action btn-delete"><i class="fas fa-trash"></i></a>
+        </td>
+    </tr>
+    {% endfor %}
+                                    
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           
+            <!-- Pending Approvals Table -->
+<div class="col-md-6">
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title fw-bold mb-0">Pending Approvals</h5>
+                <a href="#" class="btn btn-sm btn-primary">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tour</th>
+                            <th>Operator</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tour in pending_tours %}
+                        <tr>
+                            <td>{{ tour.name }}</td>
+                            <td>{{ tour.operator_name }}</td>
+                            <td>{{ tour.submitted_date }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-success me-1">Approve</button>
+                                <button class="btn btn-sm btn-danger">Reject</button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No pending approvals.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Management Section -->
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title fw-bold mb-0">User Management</h5>
+                    <button class="btn btn-primary">Add New User</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Email</th>
+                                <th>Joined</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center user-info">
+                                        <img src="{{ user.profile_picture.url }}" alt="User">
+                                        <div>
+                                            <p class="mb-0 fw-bold">{{ user.username }}</p>
+                                            <small class="text-muted">{{ user.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ user.role|title }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.date_joined }}</td>
+                                <td>
+                                    <span class="badge {% if user.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View</a></li>
+                                            <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                            <li><a class="dropdown-item" href="#"><i class="fas fa-ban me-2"></i>Suspend</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No users found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Users Tab -->
+<div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+    <div class="container-fluid px-0">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h1 class="fw-bold">User Management</h1>
+                <p class="text-muted">Manage tourists, tour operators, and administrators.</p>
+            </div>
+        </div>
+        
+        <!-- User Controls -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                            <div class="d-flex flex-wrap gap-2 mb-2 mb-md-0">
+                                <button class="btn btn-primary"><i class="fas fa-plus me-1"></i> Add User</button>
+                                <button class="btn btn-outline-secondary"><i class="fas fa-upload me-1"></i> Import</button>
+                                <button class="btn btn-outline-secondary"><i class="fas fa-download me-1"></i> Export</button>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-filter me-1"></i> Filter
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px;" aria-labelledby="filterDropdown">
+                                        <li>
+                                            <h6 class="dropdown-header">User Type</h6>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="" id="touristCheck" checked>
+                                                <label class="form-check-label" for="touristCheck">
+                                                    Tourist
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="" id="operatorCheck" checked>
+                                                <label class="form-check-label" for="operatorCheck">
+                                                    Tour Operator
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="" id="adminCheck" checked>
+                                                <label class="form-check-label" for="adminCheck">
+                                                    Admin
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <h6 class="dropdown-header">Status</h6>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="" id="activeCheck" checked>
+                                                <label class="form-check-label" for="activeCheck">
+                                                    Active
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="" id="pendingCheck" checked>
+                                                <label class="form-check-label" for="pendingCheck">
+                                                    Pending
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="" id="suspendedCheck">
+                                                <label class="form-check-label" for="suspendedCheck">
+                                                    Suspended
+                                                </label>
+                                            </div>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <h6 class="dropdown-header">Registration Date</h6>
+                                            <div class="mb-3">
+                                                <label class="form-label small">From</label>
+                                                <input type="date" class="form-control form-control-sm">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small">To</label>
+                                                <input type="date" class="form-control form-control-sm">
+                                            </div>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                                <button class="btn btn-sm btn-secondary" type="button">Reset</button>
+                                                <button class="btn btn-sm btn-primary" type="button">Apply</button>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="search-box">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="form-control" placeholder="Search users...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-stats d-flex align-items-center">
+                            <div class="icon bg-gradient-primary text-white">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stats">
+                                <h3>{{ tourist_count }}</h3>
+                                <p>Tourist Accounts</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-stats d-flex align-items-center">
+                            <div class="icon bg-gradient-success text-white">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="stats">
+                                <h3>{{ guide_count }}</h3>
+                                <p>Tour Operators</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-stats d-flex align-items-center">
+                            <div class="icon bg-gradient-warning text-white">
+                                <i class="fas fa-user-clock"></i>
+                            </div>
+                            <div class="stats">
+                                <h3>{{ pending_users }}</h3>
+                                <p>Pending Verification</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-stats d-flex align-items-center">
+                            <div class="icon bg-gradient-danger text-white">
+                                <i class="fas fa-user-slash"></i>
+                            </div>
+                            <div class="stats">
+                                <h3>{{ suspended_users }}</h3>
+                                <p>Suspended Users</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Table -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="selectAll">
+                                            </div>
+                                        </th>
+                                        <th>User</th>
+                                        <th>Type</th>
+                                        <th>Email</th>
+                                        <th>Joined</th>
+                                        <th>Last Activity</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users %}
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center user-info">
+                                                <img src="{{ user.profile_picture.url }}" alt="User">
+                                                <div>
+                                                    <p class="mb-0 fw-bold">{{ user.username }}</p>
+                                                    <small class="text-muted">{{ user.email }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-info">{{ user.role|title }}</span></td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.date_joined }}</td>
+                                        <td>{{ user.last_activity }}</td>
+                                        <td>
+                                            <span class="badge {% if user.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                                {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Actions
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View</a></li>
+                                                    <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                                    <li><a class="dropdown-item" href="#"><i class="fas fa-ban me-2"></i>Suspend</a></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">No users found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center mt-3">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+     
+<input class=
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <script>
+        // Toggle sidebar on mobile
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+        
+        // Revenue Chart
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [
+                    {
+                        label: 'Revenue',
+                        data: [15000, 22000, 19000, 28000, 32000],
+                        backgroundColor: 'rgba(58, 134, 255, 0.1)',
+                        borderColor: '#3a86ff',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Bookings',
+                        data: [120, 160, 145, 182, 210],
+                        backgroundColor: 'rgba(6, 214, 160, 0.1)',
+                        borderColor: '#06d6a0',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false,
+                            color: '#f0f0f0'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        align: 'end'
+                    }
+                }
+            }
+        });
+        
+        // User Growth Chart
+        const userCtx = document.getElementById('userChart').getContext('2d');
+        const userChart = new Chart(userCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Tourists', 'Tour Operators', 'Admins'],
+                datasets: [{
+                    data: [835, 442, 8],
+                    backgroundColor: ['#3a86ff', '#06d6a0', '#ef476f'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+        
+        // Initialize tooltips and popovers
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Sample notification and alert functionality
+        document.querySelectorAll('.btn-action').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (this.classList.contains('btn-delete')) {
+                    if (confirm('Are you sure you want to delete this item?')) {
+                        this.closest('tr').remove();
+                    }
+                }
+            });
+        });
+        
+        // Approve/Reject tour functionality
+        document.querySelectorAll('.btn-success, .btn-danger').forEach(button => {
+            button.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const tourName = row.querySelector('td:first-child').textContent;
+                
+                if (this.classList.contains('btn-success')) {
+                    alert(`Tour "${tourName}" has been approved.`);
+                } else {
+                    alert(`Tour "${tourName}" has been rejected.`);
+                }
+                
+                row.remove();
+            });
+        });
+    </script>
+    
+
+
+
+
+
+
+
+
+
+
+
+    ...
+    <script>
+        // Pass Django template variables into JavaScript
+        const revenueData = {{ revenue_chart|safe }};
+        const bookingsData = {{ bookings_chart|safe }};
+        const userRoles = {{ user_roles|safe }};
+
+        // Revenue and Bookings Line Chart
+        const revenueChart = new Chart(document.getElementById('revenueChart'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [
+                    {
+                        label: 'Revenue',
+                        data: revenueData,
+                        borderColor: '#3a86ff',
+                        backgroundColor: 'rgba(58, 134, 255, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                    },
+                    {
+                        label: 'Bookings',
+                        data: bookingsData,
+                        borderColor: '#06d6a0',
+                        backgroundColor: 'rgba(6, 214, 160, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                    }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // User Roles Doughnut Chart
+        const userChart = new Chart(document.getElementById('userChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Tourists', 'Tour Operators', 'Admins'],
+                datasets: [{
+                    data: [userRoles.tourists, userRoles.guides, userRoles.admins],
+                    backgroundColor: ['#3a86ff', '#06d6a0', '#ef476f'],
+                    borderWidth: 0
+                }]
+            },
+            options: { responsive: true, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+        });
+    </script>
+
+</body>
+</html>

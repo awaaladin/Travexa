@@ -4,67 +4,120 @@ from django.contrib.auth import authenticate, login, logout  # For handling auth
 from .forms import CustomUserCreationForm, CustomLoginForm  # Import the custom forms for registration and login
 import logging  # For logging purposes, useful for debugging
 from django.contrib import messages  # For displaying success or error messages to users
+from accounts.models import CustomUser, Tour, Booking, Payment
+from django.db.models import Count, Sum
 
-# Initialize a logger instance to record events for debugging purposes.
-logger = logging.getLogger(__name__)
 
-# This view handles the user registration process.
-def register_view(request):
-    if request.method == 'POST':  # If the request method is POST, it means the user is submitting the form.
-        form = CustomUserCreationForm(request.POST)  # Create an instance of the registration form with the POST data.
-        if form.is_valid():  # If the form is valid (all fields pass validation checks)
-            form.save()  # Save the new user to the database
-            messages.success(request, 'Registration successful! Please log in.')  # Display a success message to the user
+from django.shortcuts import render
+from django.db.models import Count, Sum
+from accounts.models import CustomUser, Tour, Booking, Payment, Review
 
-            return redirect('accounts/login')  # Redirect the user to the login page after successful registration
-    else:  # If the request method is not POST (i.e., the page is being loaded for the first time)
-        form = CustomUserCreationForm()  # Create an empty form for the user to fill out
-
-    return render(request, 'accounts/register.html', {'form': form})  # Render the registration template with the form
-
-# This view handles the user login process.
-def login_view(request):
-    if request.method == 'POST':  # If the request method is POST, it means the user is submitting the login form.
-        form = CustomLoginForm(request, data=request.POST)  # Create an instance of the login form with the POST data.
-        if form.is_valid():  # If the form is valid (credentials are correct)
-            user = form.get_user()  # Retrieve the user object based on the form data.
-            login(request, user)  # Log the user in by storing their session
-            return redirect('dashboard')  # Redirect the user to the dashboard (or any other post-login page)
-    else:  # If the request method is not POST, it means the page is being loaded for the first time
-        form = CustomLoginForm()  # Create an empty login form for the user to fill out
+def dashboard(request):
+    total_users = CustomUser.objects.count()
+    tourist_count = CustomUser.objects.filter(role='customer').count()
+    guide_count = CustomUser.objects.filter(role='guide').count()
+    admin_count = CustomUser.objects.filter(role='admin').count()
     
-    return render(request, 'accounts/login.html', {'form': form})  # Render the login template with the form
+    active_tours = Tour.objects.filter(status='active').count()
+    cancelled_tours = Tour.objects.filter(status='cancelled').count()
+    pending_tours = Tour.objects.filter(status='pending').order_by('-id')[:5]
+    
+    total_bookings = Booking.objects.count()
+    confirmed_bookings = Booking.objects.filter(status='confirmed').count()
+    pending_bookings = Booking.objects.filter(status='pending').count()
+    cancelled_bookings = Booking.objects.filter(status='cancelled').count()
 
-# This view handles the user logout process.
+    total_revenue = Payment.objects.aggregate(total=Sum('amount'))['total'] or 0
+    total_reviews = Review.objects.count()
+
+    # Recent records
+    recent_bookings = Booking.objects.select_related('user', 'tour').order_by('-date')[:5]
+    recent_tours = Tour.objects.order_by('-id')[:4]
+
+    # For charts
+    revenue_chart = [15000, 22000, 19000, 28000, 32000]
+    bookings_chart = [120, 160, 145, 182, 210]
+
+    user_roles = {
+        'tourists': tourist_count,
+        'guides': guide_count,
+        'admins': admin_count,
+    }
+
+    context = {
+        'total_users': total_users,
+        'tourist_count': tourist_count,
+        'guide_count': guide_count,
+        'admin_count': admin_count,
+        'active_tours': active_tours,
+        'pending_tours': pending_tours,
+        'cancelled_tours': cancelled_tours,
+        'total_bookings': total_bookings,
+        'confirmed_bookings': confirmed_bookings,
+        'pending_bookings': pending_bookings,
+        'cancelled_bookings': cancelled_bookings,
+        'total_revenue': total_revenue,
+        'total_reviews': total_reviews,
+        'recent_bookings': recent_bookings,
+        'recent_tours': recent_tours,
+        'revenue_chart': revenue_chart,
+        'bookings_chart': bookings_chart,
+        'user_roles': user_roles,
+    }
+
+    return render(request, 'accounts/dashboard.html', context)
+
+
+def register_view(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Registration successful.")
+            return redirect('dashboard')  # change to your desired redirect
+        else:
+            messages.error(request, "Registration failed. Please fix the errors.")
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'accounts/register.html', {'form': form})
+
+def login_view(request):
+    if request.method == 'POST':
+        form = CustomLoginForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            messages.success(request, f"Welcome back, {user.username}!")
+            return redirect('dashboard')  # change to your desired redirect
+        else:
+            messages.error(request, "Invalid username or password.")
+    else:
+        form = CustomLoginForm()
+    return render(request, 'accounts/login.html', {'form': form})
+
 def logout_view(request):
-    logout(request)  # Log the user out by clearing their session
-    return redirect('login')  # Redirect the user to the login page after logging out
+    logout(request)
+    messages.success(request, "You have been logged out.")
+    return redirect('login')
 
+def user_list(request):
+    return render(request, 'accounts/users.html')
 
-"""Imports:
+def tour_list(request):
+    return render(request, 'accounts/tours.html')
 
-1.render and redirect help render templates and redirect users to other pages.
+def booking_list(request):
+    return render(request, 'accounts/bookings.html')
 
-2.authenticate, login, logout are for handling user authentication (sign-in and sign-out).
+def payment_list(request):
+    return render(request, 'accounts/payments.html')
 
-3.CustomUserCreationForm and CustomLoginForm are custom forms for user registration and login.
+def review_list(request):
+    return render(request, 'accounts/reviews.html')
 
-4.logging helps log messages for debugging.
+def report_view(request):
+    return render(request, 'accounts/reports.html')
 
-5.messages is used to show success or error messages to the user.
-
-Functions:
-
-1.register_view: Handles the user registration process. It processes the form and saves the user data if valid. It redirects to the login page after successful registration.
-
-2.login_view: Handles the login process. It checks if the form data is valid and logs the user in if so. Then it redirects the user to the dashboard or a post-login page.
-
-3.logout_view: Logs the user out and redirects them to the login page.
-
-Form Handling:
-
-. When a request is POST, it means the user submitted a form, and Django processes the form's data (form.is_valid() checks if the form's input is valid).
-
-. If the form is valid, the appropriate action (saving the user or logging in) happens.
-
-.If the request is not POST (i.e., the page is loaded initially), an empty form is displayed for the user to fill out"""
+def settings_view(request):
+    return render(request, 'accounts/settings.html')
