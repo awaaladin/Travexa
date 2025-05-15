@@ -40,7 +40,7 @@ class Tour(models.Model):
     image = models.ImageField(upload_to='tours/')
     duration_days = models.PositiveIntegerField()
     status = models.CharField(max_length=50)
-    description = models.TextField()  # ✅ renamed from 'review' to 'description'
+    description = models.TextField()  
     created_at = models.DateTimeField(auto_now_add=True)  
 
 
