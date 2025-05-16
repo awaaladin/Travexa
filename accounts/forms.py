@@ -1,51 +1,62 @@
-# Import Django's forms library to create form classes
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from django import forms
-
-# Import built-in user creation and authentication forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-
-# Import the custom user model you defined in models.py
 from .models import CustomUser
 
 
-# Define a form for user registration based on Django’s built-in UserCreationForm
 class CustomUserCreationForm(UserCreationForm):
-    # Meta class provides metadata to specify which model the form is related to
-    class Meta:
-        # This form will use the CustomUser model (instead of Django's default User model)
-        model = CustomUser
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    role = forms.ChoiceField(
+        choices=CustomUser.ROLE_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
 
-        # These are the fields from the model to show in the form
-        # password1 and password2 are for password and password confirmation
+    class Meta:
+        model = CustomUser
         fields = ['username', 'email', 'role', 'password1', 'password2']
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.role = self.cleaned_data['role']
+        if commit:
+            user.save()
+        return user
 
-# Define a custom login form based on Django’s built-in AuthenticationForm
-class CustomLoginForm(AuthenticationForm):
-    # Override the default username field to add Bootstrap styling
+
+class CustomUserChangeForm(UserChangeForm):
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
     username = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'})  # Apply Bootstrap class
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    role = forms.ChoiceField(
+        choices=CustomUser.ROLE_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
 
-    # Override the default password field to use a password input with Bootstrap styling
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})  # Apply Bootstrap class
-    )
-
-
-"""You’re extending built-in Django forms to customize how they look and which fields they include.
-
-UserCreationForm helps with registration and AuthenticationForm helps with login.
-
-Bootstrap form-control classes are added to make the forms look cleaner and consistent with Bootstrap UI styling."""
-
-class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'password1', 'password2', 'role']
+        fields = ['username', 'email', 'role']
+
 
 class CustomLoginForm(AuthenticationForm):
-    username = forms.CharField(label="Username", max_length=100)
-    password = forms.CharField(label="Password", widget=forms.PasswordInput)
-
-
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'})
+    )

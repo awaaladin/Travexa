@@ -126,3 +126,14 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# Authentication settings
+LOGIN_URL = 'login'  # Where to redirect if user is not logged in
+LOGIN_REDIRECT_URL = 'dashboard'  # Where to redirect after successful login
+LOGOUT_REDIRECT_URL = 'login'  # Where to redirect after logout
+
+
+
+# Media files configuration for profile pictures
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
