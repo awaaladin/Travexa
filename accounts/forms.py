@@ -1,7 +1,21 @@
+from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from django import forms
 from .models import CustomUser
 
+
+# Booking Form
+class BookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['tour', 'booking_date', 'number_of_people', 'notes']
+        widgets = {
+            'booking_date': forms.DateInput(attrs={'type': 'date'}),
+            'notes': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
+# User Forms
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
