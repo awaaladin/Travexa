@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Respond to Review - {{ tour.title }} - Travexa{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Respond to Review</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>{{ tour.title }}</h5>
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge bg-info me-2">{{ tour.category }}</span>
+                            <span class="badge bg-secondary">{{ tour.location }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Original review -->
+                    <div class="card mb-4 bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">Review by {{ review.user.get_full_name|default:review.user.username }}</h6>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="text-warning">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small>
+                            </div>
+                            <p class="card-text">{{ review.comment }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Trend Analysis -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Trend Analysis</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted">The recent trend shows how the average rating has changed over the last 30 days compared to the previous 30 days.</p>
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        {% if review_summary.recent_trend.change > 0 %}
+                                            <div class="trend-indicator trend-up">
+                                                <i class="fas fa-arrow-up"></i>
+                                            </div>
+                                            <div>
+                                                <div class="display-4 fw-bold text-success">+{{ review_summary.recent_trend.change }}</div>
+                                                <p class="card-text text-muted">Improved rating</p>
+                                            </div>
+                                        {% elif review_summary.recent_trend.change < 0 %}
+                                            <div class="trend-indicator trend-down">
+                                                <i class="fas fa-arrow-down"></i>
+                                            </div>
+                                            <div>
+                                                <div class="display-4 fw-bold text-danger">{{ review_summary.recent_trend.change }}</div>
+                                                <p class="card-text text-muted">Decreased rating</p>
+                                            </div>
+                                        {% else %}
+                                            <div class="trend-indicator trend-neutral">
+                                                <i class="fas fa-equals"></i>
+                                            </div>
+                                            <div>
+                                                <div class="display-4 fw-bold text-secondary">0.0</div>
+                                                <p class="card-text text-muted">No change</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" action="{% url 'respond_to_review' review.id %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_response_text" class="form-label">Your Response</label>
+                            {{ form.response_text }}
+                            {% if form.response_text.errors %}
+                                <div class="text-danger mt-1">
+                                    {{ form.response_text.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'tour_detail' tour.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-reply me-2"></i>Submit Response
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
