@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment - {{ booking.tour.title }}{% endblock %}
+
+{% block extra_head %}
+<!-- Stripe JS -->
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+    .StripeElement {
+        box-sizing: border-box;
+        height: 40px;
+        padding: 10px 12px;
+        border: 1px solid #cfd7df;
+        border-radius: 4px;
+        background-color: white;
+        box-shadow: 0 1px 3px 0 #e6ebf1;
+        -webkit-transition: box-shadow 150ms ease;
+        transition: box-shadow 150ms ease;
+    }
+
+    .StripeElement--focus {
+        box-shadow: 0 1px 3px 0 #cfd7df;
+    }
+
+    .StripeElement--invalid {
+        border-color: #fa755a;
+    }
+
+    .StripeElement--webkit-autofill {
+        background-color: #fefde5 !important;
+    }
+    
+    .payment-form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-row {
+        margin-bottom: 20px;
+    }
+    
+    .card-errors {
+        color: #fa755a;
+        margin-top: 10px;
+    }
+    
+    .payment-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+    }
+    
+    .payment-button:hover {
+        background-color: #45a049;
+    }
+    
+    .payment-button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+    
+    .booking-details {
+        margin-bottom: 30px;
+        padding: 15px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .secure-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .secure-badge i {
+        margin-right: 5px;
+        color: #4CAF50;
+    }
+    
+    .payment-methods {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    
+    .payment-methods img {
+        height: 30px;
+        margin: 0 5px;
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Complete Your Booking</h1>
+    
+    <div class="booking-details">
+        <h3>Booking Summary</h3>
+        <p><strong>Tour:</strong> {{ booking.tour.title }}</p>
+        <p><strong>Date:</strong> {{ booking.tour_date }}</p>
+        <p><strong>Participants:</strong> {{ booking.participants }}</p>
+        <p><strong>Total Price:</strong> ${{ booking.total_price }}</p>
+    </div>
+    
+    <div class="payment-form-container">
+        <h3 class="mb-4">Payment Details</h3>
+        
+        <div class="payment-methods">
+            <img src="{% static 'images/visa.png' %}" alt="Visa">
+            <img src="{% static 'images/mastercard.png' %}" alt="Mastercard">
+            <img src="{% static 'images/amex.png' %}" alt="American Express">
+            <img src="{% static 'images/discover.png' %}" alt="Discover">
+        </div>
+        
+        <form id="payment-form" method="post">
+            {% csrf_token %}
+            
+            <div class="form-row">
+                <label for="{{ form.amount.id_for_label }}">Payment Amount ($)</label>
+                {{ form.amount }}
+                {% if form.amount.errors %}
+                    <div class="text-danger">{{ form.amount.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-row">
+                <label for="card-element">Credit or Debit Card</label>
+                <div id="card-element" class="StripeElement">
+                    <!-- Stripe Elements will create input elements here -->
+                </div>
+                <!-- Used to display form errors -->
+                <div id="card-errors" class="card-errors" role="alert"></div>
+            </div>
+            
+            <input type="hidden" name="payment_method_id" id="payment_method_id">
+            
+            <button id="submit-button" class="payment-button">
+                Pay ${{ booking.total_price }}
+            </button>
+            
+            <div class="secure-badge">
+                <i class="fas fa-lock"></i> Your payment information is secure and encrypted
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Create a Stripe client
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const elements = stripe.elements();
+    
+    // Create an instance of the card Element
+    const cardElement = elements.create('card', {
+        style: {
+            base: {
+                color: '#32325d',
+                fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                fontSmoothing: 'antialiased',
+                fontSize: '16px',
+                '::placeholder': {
+                    color: '#aab7c4'
+                }
+            },
+            invalid: {
+                color: '#fa755a',
+                iconColor: '#fa755a'
+            }
+        }
+    });
+    
+    // Add an instance of the card Element into the `card-element` div
+    cardElement.mount('#card-element');
+    
+    // Handle real-time validation errors from the card Element
+    cardElement.addEventListener('change', function(event) {
+        const displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+        } else {
+            displayError.textContent = '';
+        }
+    });
+    
+    // Handle form submission
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        // Disable the submit button to prevent repeated clicks
+        submitButton.disabled = true;
+        submitButton.textContent = 'Processing...';
+        
+        // Create a PaymentMethod and confirm the PaymentIntent
+        stripe.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+            billing_details: {
+                email: '{{ booking.user.email }}'
+            }
+        }).then(function(result) {
+            if (result.error) {
+                // Show error to your customer
+                const errorElement = document.getElementById('card-errors');
+                errorElement.textContent = result.error.message;
+                submitButton.disabled = false;
+                submitButton.textContent = 'Pay ${{ booking.total_price }}';
+            } else {
+                // Send the payment method ID to your server
+                document.getElementById('payment_method_id').value = result.paymentMethod.id;
+                form.submit();
+            }
+        });
+    });
+</script>
+{% endblock %}
