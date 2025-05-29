@@ -1,9 +1,11 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import AbstractUser
 import uuid
+import stripe
+from datetime import date, timedelta
 
 # --- Custom User Model ---
 class CustomUser(AbstractUser):
@@ -30,13 +32,11 @@ class UserProfile(models.Model):
         return f"{self.user.username}'s Profile"
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
-
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+    else:
+        instance.profile.save()
 
 # --- Tour Model ---
 class Tour(models.Model):
@@ -68,18 +68,12 @@ class Tour(models.Model):
         return self.title
 
     def get_available_dates(self):
-        from datetime import date, timedelta
         booked_dates = Booking.objects.filter(
-            tour=self, 
+            tour=self,
             status__in=['confirmed', 'pending'],
             tour_date__gte=date.today()
         ).values_list('tour_date', flat=True)
-        available_dates = []
-        for i in range(90):
-            check_date = date.today() + timedelta(days=i)
-            if check_date not in booked_dates:
-                available_dates.append(check_date)
-        return available_dates
+        return [date.today() + timedelta(days=i) for i in range(90) if (date.today() + timedelta(days=i)) not in booked_dates]
 
 # --- Tour Images ---
 class TourImage(models.Model):
@@ -116,8 +110,7 @@ class Booking(models.Model):
         if self.status in ['pending', 'confirmed']:
             self.status = 'cancelled'
             self.save()
-            payments = Payment.objects.filter(booking=self, status='completed')
-            for payment in payments:
+            for payment in self.payments.filter(status='completed'):
                 payment.issue_refund()
             return True
         return False
@@ -146,11 +139,9 @@ class Payment(models.Model):
         return f"Payment for Booking {self.booking.booking_id} - {self.amount}"
 
     def process_payment(self, payment_details):
-        import stripe
-        from django.conf import settings
         stripe.api_key = settings.STRIPE_SECRET_KEY
         try:
-            payment_intent = stripe.PaymentIntent.create(
+            intent = stripe.PaymentIntent.create(
                 amount=int(self.amount * 100),
                 currency='usd',
                 payment_method=payment_details.get('payment_method_id'),
@@ -159,10 +150,10 @@ class Payment(models.Model):
                 metadata={
                     'booking_id': str(self.booking.booking_id),
                     'user_email': self.booking.user.email,
-                    'tour_name': self.booking.tour.title
+                    'tour_name': self.booking.tour.title,
                 }
             )
-            self.transaction_id = payment_intent.id
+            self.transaction_id = intent.id
             self.status = 'completed'
             self.save()
             self.booking.status = 'confirmed'
@@ -170,21 +161,17 @@ class Payment(models.Model):
             return True
         except stripe.error.CardError:
             self.status = 'failed'
-            self.save()
-            return False
-        except (stripe.error.RateLimitError, 
-                stripe.error.InvalidRequestError, 
+        except (stripe.error.RateLimitError,
+                stripe.error.InvalidRequestError,
                 stripe.error.AuthenticationError,
                 stripe.error.APIConnectionError,
                 stripe.error.StripeError):
             self.status = 'failed'
-            self.save()
-            return False
+        self.save()
+        return False
 
     def issue_refund(self):
         if self.status == 'completed' and self.transaction_id:
-            import stripe
-            from django.conf import settings
             stripe.api_key = settings.STRIPE_SECRET_KEY
             try:
                 stripe.Refund.create(
