@@ -1,38 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 {% extends 'base.html' %}
 
 {% block title %}
@@ -363,7 +328,7 @@ Travexa Admin Dashboard
                 </a>
             </li>
             <li>
-                <a href="#users" data-bs-toggle="tab" role="tab" aria-controls="users" aria-selected="false">
+                <a href="{% url 'accounts:user' %}" >
                     <i class="fas fa-users"></i>
                     <span>Users</span>
                 </a>

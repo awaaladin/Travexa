@@ -2,7 +2,6 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm, Authenti
 from django import forms
 from .models import CustomUser
 
-
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
@@ -34,7 +33,6 @@ class CustomUserCreationForm(UserCreationForm):
             user.save()
         return user
 
-
 class CustomUserChangeForm(UserChangeForm):
     email = forms.EmailField(
         required=True,
@@ -52,11 +50,13 @@ class CustomUserChangeForm(UserChangeForm):
         model = CustomUser
         fields = ['username', 'email', 'role']
 
-
 class CustomLoginForm(AuthenticationForm):
     username = forms.CharField(
+        label="Username",
+        max_length=100,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'})
     )
     password = forms.CharField(
+        label="Password",
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'})
     )

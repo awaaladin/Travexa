@@ -1,0 +1,1109 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}User Management - Tour Booking System{% endblock %}
+
+{% block extrastyle %}
+<style>
+  :root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --light-bg: #f8f9fa;
+    --dark-text: #343a40;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+  }
+
+  .user-dashboard {
+    padding: 1.5rem;
+    background-color: var(--light-bg);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  }
+
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .dashboard-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  .dashboard-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.5;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    transition: all 0.15s ease-in-out;
+  }
+
+  .btn-primary {
+    color: #fff;
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
+
+  .btn-primary:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+  }
+
+  .btn-danger {
+    color: #fff;
+    background-color: var(--danger);
+    border-color: var(--danger);
+  }
+
+  .btn-danger:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+  }
+
+  .search-container {
+    display: flex;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-input {
+    flex-grow: 1;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem 0 0 0.25rem;
+  }
+
+  .search-button {
+    padding: 0.5rem 1rem;
+    color: #fff;
+    background-color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 0 0.25rem 0.25rem 0;
+    cursor: pointer;
+  }
+
+  .search-button:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+  }
+
+  .filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .filter-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--dark-text);
+  }
+
+  .filter-select {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    min-width: 8rem;
+  }
+
+  .user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+  }
+
+  .user-table th,
+  .user-table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .user-table th {
+    font-weight: 600;
+    background-color: #f1f3f5;
+    color: var(--dark-text);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .user-table tbody tr:hover {
+    background-color: rgba(52, 152, 219, 0.05);
+  }
+
+  .user-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .user-name {
+    font-weight: 500;
+    color: var(--primary-color);
+  }
+
+  .user-email {
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+  }
+
+  .status-active {
+    background-color: rgba(46, 204, 113, 0.15);
+    color: var(--success);
+  }
+
+  .status-inactive {
+    background-color: rgba(243, 156, 18, 0.15);
+    color: var(--warning);
+  }
+
+  .status-banned {
+    background-color: rgba(231, 76, 60, 0.15);
+    color: var(--danger);
+  }
+
+  .action-icon {
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: all 0.15s ease-in-out;
+  }
+
+  .action-icon:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .page-link:hover {
+    background-color: #e9ecef;
+  }
+
+  .page-link.active {
+    color: #fff;
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow: auto;
+  }
+
+  .modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 1.5rem;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #adb5bd;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .modal-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--dark-text);
+  }
+
+  .form-control {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+
+  .form-control:focus {
+    border-color: var(--secondary-color);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+  }
+
+  .form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .spinner {
+    display: none;
+    width: 100%;
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .spinner-border {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    vertical-align: text-bottom;
+    border: 0.25rem solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+    color: var(--secondary-color);
+  }
+
+  @keyframes spinner-border {
+    to { transform: rotate(360deg); }
+  }
+
+  .alert {
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+  }
+
+  .alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+  }
+
+  .alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .filters {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .user-table th:nth-child(3),
+    .user-table td:nth-child(3) {
+      display: none;
+    }
+
+    .user-table th:nth-child(5),
+    .user-table td:nth-child(5) {
+      display: none;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="user-dashboard">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <div class="dashboard-title">User Management</div>
+    <div class="dashboard-actions">
+      <button class="btn btn-primary" id="addUserBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16" style="margin-right: 0.5rem;">
+          <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+          <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+        </svg>
+        Add New User
+      </button>
+      <button class="btn btn-danger" id="bulkDeleteBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16" style="margin-right: 0.5rem;">
+          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+          <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+        </svg>
+        Delete Selected
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-container">
+    <input type="text" class="search-input" id="userSearch" placeholder="Search users by name, email, or phone...">
+    <button class="search-button" id="searchBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filters">
+    <div class="filter-group">
+      <label class="filter-label" for="statusFilter">Status</label>
+      <select class="filter-select" id="statusFilter">
+        <option value="">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="banned">Banned</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label" for="roleFilter">Role</label>
+      <select class="filter-select" id="roleFilter">
+        <option value="">All Roles</option>
+        <option value="admin">Administrator</option>
+        <option value="customer">Customer</option>
+        <option value="guide">Tour Guide</option>
+        <option value="manager">Manager</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label" for="dateFilter">Registration Date</label>
+      <select class="filter-select" id="dateFilter">
+        <option value="">All Time</option>
+        <option value="today">Today</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+        <option value="year">This Year</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label" for="sortFilter">Sort By</label>
+      <select class="filter-select" id="sortFilter">
+        <option value="name_asc">Name (A-Z)</option>
+        <option value="name_desc">Name (Z-A)</option>
+        <option value="date_asc">Date (Oldest First)</option>
+        <option value="date_desc">Date (Newest First)</option>
+        <option value="bookings_desc">Most Bookings</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Success/Error Alert -->
+  <div id="alertContainer"></div>
+
+  <!-- Loading Spinner -->
+  <div class="spinner" id="loadingSpinner">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <table class="user-table" id="userTable">
+    <thead>
+      <tr>
+        <th>
+          <input type="checkbox" id="selectAll">
+        </th>
+        <th>User</th>
+        <th>Contact</th>
+        <th>Role</th>
+        <th>Registration Date</th>
+        <th>Bookings</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr data-user-id="{{ user.id }}">
+        <td>
+          <input type="checkbox" class="user-select" value="{{ user.id }}">
+        </td>
+        <td>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="user-avatar">
+            {% else %}
+            <div class="user-avatar" style="background-color: #e9ecef; display: flex; align-items: center; justify-content: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+              </svg>
+            </div>
+            {% endif %}
+            <div>
+              <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+              <div class="user-email">{{ user.username }}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div>{{ user.email }}</div>
+          {% if user.phone %}
+          <div style="font-size: 0.875rem; color: #6c757d;">{{ user.phone }}</div>
+          {% endif %}
+        </td>
+        <td>{{ user.role }}</td>
+        <td>{{ user.date_joined|date:"M d, Y" }}</td>
+        <td>{{ user.bookings_count }}</td>
+        <td>
+          {% if user.is_active %}
+          <span class="status-badge status-active">Active</span>
+          {% elif user.is_banned %}
+          <span class="status-badge status-banned">Banned</span>
+          {% else %}
+          <span class="status-badge status-inactive">Inactive</span>
+          {% endif %}
+        </td>
+        <td>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="action-icon edit-user" data-user-id="{{ user.id }}" title="Edit User">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+              </svg>
+            </button>
+            <button class="action-icon view-user" data-user-id="{{ user.id }}" title="View User Details">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+              </svg>
+            </button>
+            <button class="action-icon delete-user" data-user-id="{{ user.id }}" title="Delete User">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 2rem;">No users found. Add new users or adjust your filters.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    {% if users.has_previous %}
+    <a href="?page=1" class="page-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+        <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+      </svg>
+    </a>
+    <a href="?page={{ users.previous_page_number }}" class="page-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+      </svg>
+    </a>
+    {% endif %}
+    
+    {% for i in users.paginator.page_range %}
+      {% if users.number == i %}
+        <a class="page-link active">{{ i }}</a>
+      {% elif i > users.number|add:"-3" and i < users.number|add:"3" %}
+        <a href="?page={{ i }}" class="page-link">{{ i }}</a>
+      {% endif %}
+    {% endfor %}
+    
+    {% if users.has_next %}
+    <a href="?page={{ users.next_page_number }}" class="page-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2
+      <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+      </svg>
+    </a>
+    <a href="?page={{ users.paginator.num_pages }}" class="page-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"/>
+        <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"/>
+      </svg>
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Add/Edit User Modal -->
+  <div class="modal" id="userModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeUserModal">&times;</button>
+      <div class="modal-header">
+        <h3 class="modal-title" id="userModalTitle">Add New User</h3>
+      </div>
+      <form id="userForm" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" id="userId" name="user_id" value="">
+        
+        <div class="form-group">
+          <label class="form-label" for="firstName">First Name*</label>
+          <input type="text" class="form-control" id="firstName" name="first_name" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="lastName">Last Name*</label>
+          <input type="text" class="form-control" id="lastName" name="last_name" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="username">Username*</label>
+          <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address*</label>
+          <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number</label>
+          <input type="tel" class="form-control" id="phone" name="phone">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank to keep current password">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="role">Role*</label>
+          <select class="form-control" id="role" name="role" required>
+            <option value="customer">Customer</option>
+            <option value="guide">Tour Guide</option>
+            <option value="manager">Manager</option>
+            <option value="admin">Administrator</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="status">Status*</label>
+          <select class="form-control" id="status" name="status" required>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="banned">Banned</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="profilePicture">Profile Picture</label>
+          <input type="file" class="form-control" id="profilePicture" name="profile_picture" accept="image/*">
+        </div>
+        
+        <div class="form-footer">
+          <button type="button" class="btn btn-danger" id="cancelUserBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveUserBtn">Save User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View User Details Modal -->
+  <div class="modal" id="viewUserModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeViewUserModal">&times;</button>
+      <div class="modal-header">
+        <h3 class="modal-title">User Details</h3>
+      </div>
+      <div id="userDetails">
+        <div class="spinner" id="userDetailsLoading">
+          <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+        <!-- User details will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeDeleteModal">&times;</button>
+      <div class="modal-header">
+        <h3 class="modal-title">Confirm Deletion</h3>
+      </div>
+      <p>Are you sure you want to delete the selected user(s)? This action cannot be undone.</p>
+      <div class="form-footer">
+        <button type="button" class="btn btn-primary" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Variables
+    const userModal = document.getElementById('userModal');
+    const viewUserModal = document.getElementById('viewUserModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const userForm = document.getElementById('userForm');
+    const addUserBtn = document.getElementById('addUserBtn');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    const searchBtn = document.getElementById('searchBtn');
+    const userSearch = document.getElementById('userSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const roleFilter = document.getElementById('roleFilter');
+    const dateFilter = document.getElementById('dateFilter');
+    const sortFilter = document.getElementById('sortFilter');
+    const selectAll = document.getElementById('selectAll');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const alertContainer = document.getElementById('alertContainer');
+    const userTable = document.getElementById('userTable');
+    
+    // Event listeners
+    addUserBtn.addEventListener('click', openAddUserModal);
+    
+    document.getElementById('closeUserModal').addEventListener('click', function() {
+      userModal.style.display = 'none';
+    });
+    
+    document.getElementById('closeViewUserModal').addEventListener('click', function() {
+      viewUserModal.style.display = 'none';
+    });
+    
+    document.getElementById('closeDeleteModal').addEventListener('click', function() {
+      deleteModal.style.display = 'none';
+    });
+    
+    document.getElementById('cancelUserBtn').addEventListener('click', function() {
+      userModal.style.display = 'none';
+    });
+    
+    document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
+      deleteModal.style.display = 'none';
+    });
+    
+    selectAll.addEventListener('change', function() {
+      const checkboxes = document.querySelectorAll('.user-select');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+      });
+      updateBulkDeleteButton();
+    });
+    
+    // Add event listeners to table action buttons
+    document.querySelectorAll('.edit-user').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const userId = this.getAttribute('data-user-id');
+        openEditUserModal(userId);
+      });
+    });
+    
+    document.querySelectorAll('.view-user').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const userId = this.getAttribute('data-user-id');
+        openViewUserModal(userId);
+      });
+    });
+    
+    document.querySelectorAll('.delete-user').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const userId = this.getAttribute('data-user-id');
+        openDeleteModal([userId]);
+      });
+    });
+    
+    document.querySelectorAll('.user-select').forEach(checkbox => {
+      checkbox.addEventListener('change', updateBulkDeleteButton);
+    });
+    
+    bulkDeleteBtn.addEventListener('click', function() {
+      const selectedUsers = getSelectedUsers();
+      if (selectedUsers.length > 0) {
+        openDeleteModal(selectedUsers);
+      } else {
+        showAlert('Please select at least one user to delete.', 'danger');
+      }
+    });
+    
+    document.getElementById('confirmDeleteBtn').addEventListener('click', deleteUsers);
+    
+    searchBtn.addEventListener('click', filterUsers);
+    userSearch.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        filterUsers();
+      }
+    });
+    
+    statusFilter.addEventListener('change', filterUsers);
+    roleFilter.addEventListener('change', filterUsers);
+    dateFilter.addEventListener('change', filterUsers);
+    sortFilter.addEventListener('change', filterUsers);
+    
+    userForm.addEventListener('submit', saveUser);
+    
+    // Functions
+    function openAddUserModal() {
+      document.getElementById('userModalTitle').textContent = 'Add New User';
+      userForm.reset();
+      document.getElementById('userId').value = '';
+      userModal.style.display = 'block';
+    }
+    
+    function openEditUserModal(userId) {
+      document.getElementById('userModalTitle').textContent = 'Edit User';
+      loadingSpinner.style.display = 'block';
+      
+      // Fetch user data (this would be an AJAX call to your Django view)
+      fetch(`/admin/users/${userId}/`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('userId').value = data.id;
+          document.getElementById('firstName').value = data.first_name;
+          document.getElementById('lastName').value = data.last_name;
+          document.getElementById('username').value = data.username;
+          document.getElementById('email').value = data.email;
+          document.getElementById('phone').value = data.phone || '';
+          document.getElementById('role').value = data.role;
+          
+          if (data.is_active && !data.is_banned) {
+            document.getElementById('status').value = 'active';
+          } else if (data.is_banned) {
+            document.getElementById('status').value = 'banned';
+          } else {
+            document.getElementById('status').value = 'inactive';
+          }
+          
+          loadingSpinner.style.display = 'none';
+          userModal.style.display = 'block';
+        })
+        .catch(error => {
+          console.error('Error fetching user data:', error);
+          showAlert('Error loading user data. Please try again.', 'danger');
+          loadingSpinner.style.display = 'none';
+        });
+    }
+    
+    function openViewUserModal(userId) {
+      const userDetails = document.getElementById('userDetails');
+      document.getElementById('userDetailsLoading').style.display = 'block';
+      userDetails.innerHTML = '';
+      
+      // Fetch user details
+      fetch(`/admin/users/${userId}/details/`)
+        .then(response => response.json())
+        .then(data => {
+          let html = `
+            <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem;">
+              <div style="flex-shrink: 0; width: 100px; height: 100px; overflow: hidden; border-radius: 50%;">
+                ${data.profile_picture ? 
+                  `<img src="${data.profile_picture}" alt="${data.username}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                  `<div style="width: 100%; height: 100%; background-color: #e9ecef; display: flex; align-items: center; justify-content: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                      <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                    </svg>
+                  </div>`
+                }
+              </div>
+              <div>
+                <h2 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 600;">${data.first_name} ${data.last_name}</h2>
+                <div style="color: #6c757d; margin-bottom: 0.25rem;">${data.username}</div>
+                <div style="display: inline-block; padding: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: 600; border-radius: 0.25rem; ${
+                  data.is_active && !data.is_banned ? 
+                    'background-color: rgba(46, 204, 113, 0.15); color: var(--success);' :
+                    data.is_banned ?
+                      'background-color: rgba(231, 76, 60, 0.15); color: var(--danger);' :
+                      'background-color: rgba(243, 156, 18, 0.15); color: var(--warning);'
+                }">${
+                  data.is_active && !data.is_banned ? 'Active' : data.is_banned ? 'Banned' : 'Inactive'
+                }</div>
+              </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+              <div>
+                <div style="font-size: 0.75rem; font-weight: 600; color: #6c757d; margin-bottom: 0.25rem;">Email</div>
+                <div>${data.email}</div>
+              </div>
+              <div>
+                <div style="font-size: 0.75rem; font-weight: 600; color: #6c757d; margin-bottom: 0.25rem;">Phone</div>
+                <div>${data.phone || 'Not provided'}</div>
+              </div>
+              <div>
+                <div style="font-size: 0.75rem; font-weight: 600; color: #6c757d; margin-bottom: 0.25rem;">Role</div>
+                <div>${data.role}</div>
+              </div>
+              <div>
+                <div style="font-size: 0.75rem; font-weight: 600; color: #6c757d; margin-bottom: 0.25rem;">Registration Date</div>
+                <div>${data.date_joined}</div>
+              </div>
+              <div>
+                <div style="font-size: 0.75rem; font-weight: 600; color: #6c757d; margin-bottom: 0.25rem;">Last Login</div>
+                <div>${data.last_login || 'Never'}</div>
+              </div>
+              <div>
+                <div style="font-size: 0.75rem; font-weight: 600; color: #6c757d; margin-bottom: 0.25rem;">Total Bookings</div>
+                <div>${data.bookings_count}</div>
+              </div>
+            </div>
+            
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Recent Bookings</h3>
+            ${data.recent_bookings && data.recent_bookings.length > 0 ?
+              `<table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr>
+                    <th style="text-align: left; padding: 0.5rem; border-bottom: 1px solid #dee2e6;">Tour</th>
+                    <th style="text-align: left; padding: 0.5rem; border-bottom: 1px solid #dee2e6;">Date</th>
+                    <th style="text-align: left; padding: 0.5rem; border-bottom: 1px solid #dee2e6;">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${data.recent_bookings.map(booking => `
+                    <tr>
+                      <td style="padding: 0.5rem; border-bottom: 1px solid #dee2e6;">${booking.tour_name}</td>
+                      <td style="padding: 0.5rem; border-bottom: 1px solid #dee2e6;">${booking.date}</td>
+                      <td style="padding: 0.5rem; border-bottom: 1px solid #dee2e6;">
+                        <span style="display: inline-block; padding: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: 600; border-radius: 0.25rem; ${
+                          booking.status === 'Confirmed' ? 
+                            'background-color: rgba(46, 204, 113, 0.15); color: var(--success);' :
+                            booking.status === 'Cancelled' ?
+                              'background-color: rgba(231, 76, 60, 0.15); color: var(--danger);' :
+                              'background-color: rgba(243, 156, 18, 0.15); color: var(--warning);'
+                        }">${booking.status}</span>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>`
+              : '<p>No recent bookings found.</p>'
+            }
+            
+            <div class="form-footer">
+              <button type="button" class="btn btn-primary" onclick="document.getElementById('closeViewUserModal').click();">Close</button>
+              <button type="button" class="btn btn-primary" data-user-id="${data.id}" onclick="document.querySelector('.edit-user[data-user-id=\\'${data.id}\\']').click();">Edit User</button>
+            </div>
+          `;
+          
+          userDetails.innerHTML = html;
+          document.getElementById('userDetailsLoading').style.display = 'none';
+        })
+        .catch(error => {
+          console.error('Error fetching user details:', error);
+          userDetails.innerHTML = '<p class="alert alert-danger">Error loading user details. Please try again.</p>';
+          document.getElementById('userDetailsLoading').style.display = 'none';
+        });
+
+      viewUserModal.style.display = 'block';
+    }
+    
+    function openDeleteModal(userIds) {
+      // Store user IDs to delete
+      deleteModal.setAttribute('data-user-ids', JSON.stringify(userIds));
+      deleteModal.style.display = 'block';
+    }
+    
+    function saveUser(e) {
+      e.preventDefault();
+      loadingSpinner.style.display = 'block';
+      
+      const formData = new FormData(userForm);
+      const userId = document.getElementById('userId').value;
+      const url = userId ? `/admin/users/${userId}/update/` : '/admin/users/create/';
+      
+      fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          userModal.style.display = 'none';
+          showAlert(data.message, 'success');
+          // Reload the page to show updated data
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          showAlert(data.message, 'danger');
+        }
+        loadingSpinner.style.display = 'none';
+      })
+      .catch(error => {
+        console.error('Error saving user:', error);
+        showAlert('Error saving user. Please try again.', 'danger');
+        loadingSpinner.style.display = 'none';
+      });
+    }
+    
+    function deleteUsers() {
+      const userIds = JSON.parse(deleteModal.getAttribute('data-user-ids'));
+      loadingSpinner.style.display = 'block';
+      
+      fetch('/admin/users/delete/', {
+        method: 'POST',
+        body: JSON.stringify({ user_ids: userIds }),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          deleteModal.style.display = 'none';
+          showAlert(data.message, 'success');
+          // Reload the page to show updated data
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          showAlert(data.message, 'danger');
+        }
+        loadingSpinner.style.display = 'none';
+      })
+      .catch(error => {
+        console.error('Error deleting users:', error);
+        showAlert('Error deleting users. Please try again.', 'danger');
+        loadingSpinner.style.display = 'none';
+      });
+    }
+    
+    function filterUsers() {
+      const searchQuery = userSearch.value;
+      const status = statusFilter.value;
+      const role = roleFilter.value;
+      const date = dateFilter.value;
+      const sort = sortFilter.value;
+      
+      // Build query string
+      const params = new URLSearchParams();
+      if (searchQuery) params.append('search', searchQuery);
+      if (status) params.append('status', status);
+      if (role) params.append('role', role);
+      if (date) params.append('date', date);
+      if (sort) params.append('sort', sort);
+      
+      // Redirect to the same page with filters
+      window.location.href = `?${params.toString()}`;
+    }
+    
+    function getSelectedUsers() {
+      const checkboxes = document.querySelectorAll('.user-select:checked');
+      return Array.from(checkboxes).map(checkbox => checkbox.value);
+    }
+    
+    function updateBulkDeleteButton() {
+      const selectedCount = document.querySelectorAll('.user-select:checked').length;
+      bulkDeleteBtn.textContent = selectedCount > 0 ? `Delete Selected (${selectedCount})` : 'Delete Selected';
+      bulkDeleteBtn.disabled = selectedCount === 0;
+    }
+    
+    function showAlert(message, type) {
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+      
+      alertContainer.innerHTML = '';
+      alertContainer.appendChild(alert);
+      
+      // Auto hide alert after 5 seconds
+      setTimeout(() => {
+        alert.style.opacity = '0';
+        alert.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+          alertContainer.removeChild(alert);
+        }, 500);
+      }, 5000);
+    }
+    
+    // Initialize
+    updateBulkDeleteButton();
+  });
+</script>
+{% endblock %}
