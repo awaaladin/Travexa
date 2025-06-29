@@ -1,0 +1,51 @@
+{% extends "admin/base_site.html" %}
+{% load i18n log %}
+{% block title %}Travexa Admin Dashboard{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="display-5 fw-bold text-success">Welcome, {{ user.username|title }} (Admin)</h1>
+    <p class="lead">Here are your latest platform stats and activities.</p>
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="bg-white rounded shadow-sm p-4 h-100">
+                <h5 class="mb-3 text-success">Site Administration</h5>
+                {% if app_list %}
+                    <div class="list-group">
+                        {% for app in app_list %}
+                            <div class="mb-3">
+                                <h6 class="fw-bold">{{ app.name }}</h6>
+                                <ul class="list-group list-group-flush">
+                                    {% for model in app.models %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <a href="{{ model.admin_url }}">{{ model.name }}</a>
+                                            <span>
+                                                {% if model.add_url %}<a href="{{ model.add_url }}" class="btn btn-sm btn-outline-success">Add</a>{% endif %}
+                                                <a href="{{ model.admin_url }}" class="btn btn-sm btn-outline-primary">Change</a>
+                                            </span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No apps are available.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bg-white rounded shadow-sm p-4 h-100">
+                <h5 class="mb-3 text-success">Recent Actions</h5>
+                {% get_admin_log 10 as admin_log for_user user %}
+                <ul class="list-group">
+                    {% for entry in admin_log %}
+                        <li class="list-group-item">{{ entry.object_repr }} - {{ entry.action_time }}</li>
+                    {% empty %}
+                        <li class="list-group-item">No recent actions.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

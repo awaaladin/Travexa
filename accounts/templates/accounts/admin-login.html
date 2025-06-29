@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Travexa | Admin Login{% endblock %}
+{% block content %}
+<div class="login-container mx-auto my-5">
+    <div class="login-header">
+        <img src="/static/images/travexa-logo.png" alt="Travexa Logo" class="rounded-circle">
+        <h4>Admin Login</h4>
+        <p class="mb-0">Enter your credentials to access the admin dashboard</p>
+    </div>
+    <div class="login-form">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="form-floating mb-3">
+                {{ form.username|as_widget:attrs }}
+                <label for="id_username">Username</label>
+                {{ form.username.errors }}
+            </div>
+            <div class="form-floating mb-3">
+                {{ form.password|as_widget:attrs }}
+                <label for="id_password">Password</label>
+                {{ form.password.errors }}
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="rememberMe" name="remember_me">
+                <label class="form-check-label" for="rememberMe">Remember me</label>
+            </div>
+            <button type="submit" class="btn btn-login w-100">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </button>
+        </form>
+        <div class="forgot-password">
+            <a href="{% url 'accounts:password_reset' %}">Forgot your password?</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

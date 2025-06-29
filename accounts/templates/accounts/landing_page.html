@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travexa - Discover Amazing Tours</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="images/travexa-logo.png" alt="Travexa Logo" height="40">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Tours</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Destinations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                </ul>
+                <div class="ms-lg-4 mt-3 mt-lg-0 d-flex">
+                    <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">Log In</button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signupModal">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active" style="background-image: url('images/hero-1.jpg')">
+                    <div class="container h-100">
+                        <div class="row h-100 align-items-center">
+                            <div class="col-md-8 col-lg-6 text-white">
+                                <h1 class="display-4 fw-bold">Explore the World with Travexa</h1>
+                                <p class="lead mb-4">Discover amazing tours and unforgettable experiences around the globe</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item" style="background-image: url('images/hero-2.jpg')">
+                    <div class="container h-100">
+                        <div class="row h-100 align-items-center">
+                            <div class="col-md-8 col-lg-6 text-white">
+                                <h1 class="display-4 fw-bold">Adventure Awaits You</h1>
+                                <p class="lead mb-4">Book your next adventure with just a few clicks</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item" style="background-image: url('images/hero-3.jpg')">
+                    <div class="container h-100">
+                        <div class="row h-100 align-items-center">
+                            <div class="col-md-8 col-lg-6 text-white">
+                                <h1 class="display-4 fw-bold">Create Lasting Memories</h1>
+                                <p class="lead mb-4">Experience the best tours with our expert guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <div class="container">
+                <div class="search-card">
+                    <form action="/search" method="get">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="destination" name="destination" placeholder="Where to?" list="destinations">
+                                    <label for="destination"><i class="fas fa-map-marker-alt me-2"></i>Destination</label>
+                                    <datalist id="destinations">
+                                        <option value="Bali, Indonesia">
+                                        <option value="Paris, France">
+                                        <option value="Tokyo, Japan">
+                                        <option value="New York, USA">
+                                        <option value="Sydney, Australia">
+                                    </datalist>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <select class="form-select" id="tourType" name="tourType">
+                                        <option value="" selected>All Types</option>
+                                        <option value="luxury">Luxury</option>
+                                        <option value="budget">Budget</option>
+                                        <option value="family">Family</option>
+                                        <option value="solo">Solo</option>
+                                        <option value="group">Group</option>
+                                    </select>
+                                    <label for="tourType"><i class="fas fa-tag me-2"></i>Tour Type</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <select class="form-select" id="duration" name="duration">
+                                        <option value="" selected>Any Duration</option>
+                                        <option value="1-3">1-3 Days</option>
+                                        <option value="4-7">4-7 Days</option>
+                                        <option value="8-14">8-14 Days</option>
+                                        <option value="15+">15+ Days</option>
+                                    </select>
+                                    <label for="duration"><i class="fas fa-clock me-2"></i>Duration</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary btn-search h-100 w-100">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="search-features">
+                                    <span class="feature-badge"><i class="fas fa-bolt"></i> Instant Booking</span>
+                                    <span class="feature-badge"><i class="fas fa-shield-alt"></i> Secure Payment</span>
+                                    <span class="feature-badge"><i class="fas fa-headset"></i> 24/7 Support</span>
+                                    <span class="feature-badge"><i class="fas fa-tag"></i> Best Price Guarantee</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Tours Section -->
+    <section class="featured-tours py-5">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">Featured Tours</h2>
+                <p class="section-subtitle">Discover our most popular experiences</p>
+            </div>
+            <div class="row g-4">
+                <!-- Tour Card 1 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="tour-card">
+                        <div class="tour-card-image">
+                            <img src="images/tour-1.jpg" alt="Bali Paradise" class="img-fluid">
+                            <div class="tour-card-badges">
+                                <span class="badge bg-primary">Featured</span>
+                                <span class="badge bg-success">20% OFF</span>
+                            </div>
+                            <button class="btn-wishlist"><i class="far fa-heart"></i></button>
+                        </div>
+                        <div class="tour-card-body">
+                            <div class="tour-card-rating">
+                                <span class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </span>
+                                <span class="rating-count">(48)</span>
+                            </div>
+                            <h3 class="tour-card-title">Bali Paradise Exploration</h3>
+                            <div class="tour-card-info">
+                                <p><i class="fas fa-map-marker-alt"></i> Bali, Indonesia</p>
+                                <p><i class="far fa-clock"></i> 7 Days</p>
+                            </div>
+                            <div class="tour-card-footer">
+                                <div class="tour-price">
+                                    <span class="price-from">From</span>
+                                    <span class="price">$1,299</span>
+                                </div>
+                                <a href="/tour/bali-paradise" class="btn btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tour Card 2 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="tour-card">
+                        <div class="tour-card-image">
+                            <img src="images/tour-2.jpg" alt="Paris Magic" class="img-fluid">
+                            <div class="tour-card-badges">
+                                <span class="badge bg-primary">Popular</span>
+                            </div>
+                            <button class="btn-wishlist"><i class="far fa-heart"></i></button>
+                        </div>
+                        <div class="tour-card-body">
+                            <div class="tour-card-rating">
+                                <span class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </span>
+                                <span class="rating-count">(36)</span>
+                            </div>
+                            <h3 class="tour-card-title">Paris Magic Experience</h3>
+                            <div class="tour-card-info">
+                                <p><i class="fas fa-map-marker-alt"></i> Paris, France</p>
+                                <p><i class="far fa-clock"></i> 5 Days</p>
+                            </div>
+                            <div class="tour-card-footer">
+                                <div class="tour-price">
+                                    <span class="price-from">From</span>
+                                    <span class="price">$899</span>
+                                </div>
+                                <a href="/tour/paris-magic" class="btn btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tour Card 3 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="tour-card">
+                        <div class="tour-card-image">
+                            <img src="images/tour-3.jpg" alt="Safari Adventure" class="img-fluid">
+                            <div class="tour-card-badges">
+                                <span class="badge bg-warning text-dark">Last Minute</span>
+                            </div>
+                            <button class="btn-wishlist"><i class="far fa-heart"></i></button>
+                        </div>
+                        <div class="tour-card-body">
+                            <div class="tour-card-rating">
+                                <span class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </span>
+                                <span class="rating-count">(29)</span>
+                            </div>
+                            <h3 class="tour-card-title">African Safari Adventure</h3>
+                            <div class="tour-card-info">
+                                <p><i class="fas fa-map-marker-alt"></i> Kenya</p>
+                                <p><i class="far fa-clock"></i> 10 Days</p>
+                            </div>
+                            <div class="tour-card-footer">
+                                <div class="tour-price">
+                                    <span class="price-from">From</span>
+                                    <span class="price">$2,499</span>
+                                </div>
+                                <a href="/tour/safari-adventure" class="btn btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5">
+                <a href="/tours" class="btn btn-outline-primary btn-lg">View All Tours</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories-section py-5 bg-light">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">Explore by Category</h2>
+                <p class="section-subtitle">Find the perfect tour experience for you</p>
+            </div>
+            <div class="categories-slider">
+                <div class="row g-4 justify-content-center">
+                    <!-- Category 1 -->
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                        <a href="/category/adventure" class="category-card">
+                            <div class="category-icon">
+                                <i class="fas fa-hiking"></i>
+                            </div>
+                            <h4 class="category-title">Adventure</h4>
+                            <span class="category-count">42 Tours</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Category 2 -->
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                        <a href="/category/cultural" class="category-card">
+                            <div class="category-icon">
+                                <i class="fas fa-landmark"></i>
+                            </div>
+                            <h4 class="category-title">Cultural</h4>
+                            <span class="category-count">38 Tours</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Category 3 -->
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                        <a href="/category/beach" class="category-card">
+                            <div class="category-icon">
+                                <i class="fas fa-umbrella-beach"></i>
+                            </div>
+                            <h4 class="category-title">Beach</h4>
+                            <span class="category-count">29 Tours</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Category 4 -->
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                        <a href="/category/mountain" class="category-card">
+                            <div class="category-icon">
+                                <i class="fas fa-mountain"></i>
+                            </div>
+                            <h4 class="category-title">Mountain</h4>
+                            <span class="category-count">24 Tours</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Category 5 -->
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                        <a href="/category/city" class="category-card">
+                            <div class="category-icon">
+                                <i class="fas fa-city"></i>
+                            </div>
+                            <h4 class="category-title">City</h4>
+                            <span class="category-count">31 Tours</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Category 6 -->
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                        <a href="/category/wildlife" class="category-card">
+                            <div class="category-icon">
+                                <i class="fas fa-paw"></i>
+                            </div>
+                            <h4 class="category-title">Wildlife</h4>
+                            <span class="category-count">18 Tours</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works py-5">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">Book your dream tour in just 3 simple steps</p>
+            </div>
+            <div class="row g-4">
+                <!-- Step 1 -->
+                <div class="col-md-4">
+                    <div class="step-card text-center">
+                        <div class="step-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Discover</h3>
+                        <p class="step-description">Search for your perfect tour by destination, date, or activity type</p>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="col-md-4">
+                    <div class="step-card text-center">
+                        <div class="step-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Book</h3>
+                        <p class="step-description">Select your dates, complete your booking, and secure your spot instantly</p>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="col-md-4">
+                    <div class="step-card text-center">
+                        <div class="step-icon">
+                            <i class="fas fa-suitcase"></i>
+                        </div>
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">Experience</h3>
+                        <p class="step-description">Enjoy your tour with our expert guides and create memories that last forever</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section py-5 bg-light">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">What Our Travelers Say</h2>
+                <p class="section-subtitle">Real experiences from real people</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <!-- Testimonial 1 -->
+                            <div class="carousel-item active">
+                                <div class="testimonial-card text-center">
+                                    <div class="testimonial-avatar">
+                                        <img src="images/testimonial-1.jpg" alt="Sarah Johnson">
+                                    </div>
+                                    <div class="testimonial-rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-text">
+                                        "Our Paris tour was absolutely magical! The guide was knowledgeable and friendly, and the itinerary was perfect. We saw all the major attractions without feeling rushed. Highly recommend Travexa for your next adventure!"
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <h4>Sarah Johnson</h4>
+                                        <p>Paris Magic Experience</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Testimonial 2 -->
+                            <div class="carousel-item">
+                                <div class="testimonial-card text-center">
+                                    <div class="testimonial-avatar">
+                                        <img src="images/testimonial-2.jpg" alt="Michael Chen">
+                                    </div>
+                                    <div class="testimonial-rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-text">
+                                        "The African Safari exceeded all expectations! We saw the Big Five in just three days, and our accommodations were luxurious. The booking process was seamless, and the tour operator was responsive to all our questions."
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <h4>Michael Chen</h4>
+                                        <p>African Safari Adventure</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Testimonial 3 -->
+                            <div class="carousel-item">
+                                <div class="testimonial-card text-center">
+                                    <div class="testimonial-avatar">
+                                        <img src="images/testimonial-3.jpg" alt="Emma Rodriguez">
+                                    </div>
+                                    <div class="testimonial-rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                    <blockquote class="testimonial-text">
+                                        "Bali was a dream come true! The cultural experiences were immersive, and the beaches were pristine. I appreciated the balance between structured activities and free time. Travexa made the entire experience stress-free!"
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <h4>Emma Rodriguez</h4>
+                                        <p>Bali Paradise Exploration</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        <div class="carousel-indicators mt-4">
+                            <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section py-5" style="background-image: url('images/cta-bg.jpg')">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center text-white">
+                    <h2 class="cta-title mb-4">Ready for Your Next Adventure?</h2>
+                    <p class="cta-text mb-4">Sign up today and get exclusive access to special offers and last-minute deals</p>
+                    <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#signupModal">Start Exploring Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h4 class="mb-4">Travexa</h4>
+                    <p>Discover amazing tours and unforgettable experiences around the globe with Travexa - your trusted travel companion.</p>
+                    <div class="social-links mt-3">
+                        <a href="#" class="me-2"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="me-2"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="me-2"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <h5 class="mb-4">Quick Links</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Tours</a></li>
+                        <li><a href="#">Destinations</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="mb-4">Support</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cancellation Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="mb-4">Contact Info</h5>
+                    <ul class="list-unstyled contact-info">
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Travel Street, Suite 100, City, Country</li>
+                        <li><i class="fas fa-phone me-2"></i> +1 (123) 456-7890</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@travexa.com</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="mt-4 mb-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 Travexa. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="payment-methods">
+                        <i class="fab fa-cc-visa me-2"></i>
+                        <i class="fab fa-cc-mastercard me-2"></i>
+                        <i class="fab fa-cc-amex me-2"></i>
+                        <i class="fab fa-cc-paypal"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Log In to Your Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm" action="/login" method="post">
+                        <div class="mb-3">
+                            <label for="loginEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="loginEmail" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" name="password" required>
+                            <div class="form-text text-end">
+                                <a href="#" class="forgot-password">Forgot Password?</a>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Log In</button>
+                            <button type="button" class="btn btn-outline-primary google-login">
+                                <img src="images/google-icon.png" alt="Google" height="18" class="me-2">
+                                Continue with Google
+                            </button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p>Don't have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#signupModal" data-bs-dismiss="modal">Sign Up</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signupModalLabel">Create an Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="signupForm" action="{% url 'accounts:register' %}" method="post">
+                        {% csrf_token %}
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.errors }}
+                            </div>
+                        {% endif %}
+                        {{ form.as_p }}
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn btn-primary">Sign Up</button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p>Already have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Log In</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & jQuery JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+</body>
+</html>

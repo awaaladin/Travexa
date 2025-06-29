@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Browse Tours - Travexa{% endblock %}
+{% block extra_head %}
+<style>
+    :root {
+        --primary-color: #16a34a;
+        --primary-hover: #15803d;
+        --secondary-color: #bbf7d0;
+        --card-bg: #f0f9f0;
+        --card-radius: 12px;
+        --card-shadow: 0 4px 6px rgba(22, 163, 74, 0.08);
+    }
+    .dashboard-card {
+        background: var(--card-bg);
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
+        border: none;
+        margin-bottom: 1rem;
+        max-width: 100%;
+        width: 100%;
+    }
+    .dashboard-btn-primary {
+        background: var(--primary-color);
+        color: #fff;
+        border: none;
+    }
+    .dashboard-btn-primary:hover {
+        background: var(--primary-hover);
+        color: #fff;
+    }
+    @media (max-width: 600px) {
+        .dashboard-card {
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+        .container.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Available Tours</h2>
+    <div class="row">
+        {% for tour in tours %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 dashboard-card">
+                {% if tour.featured_image %}
+                <img src="{{ tour.featured_image.url }}" class="card-img-top" alt="{{ tour.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ tour.title }}</h5>
+                    <p class="card-text">{{ tour.location }}</p>
+                    <p class="card-text fw-bold">${{ tour.price|floatformat:2 }}</p>
+                    <a href="{% url 'accounts:tour_detail' tour.id %}" class="btn dashboard-btn-primary">View Tour</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No tours available at the moment.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

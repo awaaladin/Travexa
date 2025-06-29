@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings - Travexa{% endblock %}
+{% block extra_head %}
+<style>
+    :root {
+        --primary-color: #16a34a;
+        --primary-hover: #15803d;
+        --secondary-color: #bbf7d0;
+        --card-bg: #f0f9f0;
+        --card-radius: 12px;
+        --card-shadow: 0 4px 6px rgba(22, 163, 74, 0.08);
+    }
+    .dashboard-card {
+        background: var(--card-bg);
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
+        border: none;
+        margin-bottom: 1rem;
+        max-width: 100%;
+        width: 100%;
+    }
+    .dashboard-badge {
+        background: var(--primary-color);
+        color: #fff;
+        border-radius: 8px;
+        padding: 0.25em 0.75em;
+        font-size: 0.9em;
+    }
+    @media (max-width: 600px) {
+        .dashboard-card {
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+        .container.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">My Bookings</h2>
+    <div class="row">
+        {% for booking in bookings %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ booking.tour.title }}</h5>
+                    <p class="card-text">Date: {{ booking.booking_date|date:"M d, Y" }}</p>
+                    <p class="card-text fw-bold">${{ booking.total_price|floatformat:2 }}</p>
+                    <span class="dashboard-badge">{{ booking.get_status_display }}</span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No bookings found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

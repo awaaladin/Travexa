@@ -1,0 +1,46 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+{% block title %}Travexa | Admin Login{% endblock %}
+{% block content %}
+<div class="login-container mx-auto my-5">
+    <div class="login-header">
+        <img src="{% static 'images/travexa-logo.png' %}" alt="Travexa Logo" class="rounded-circle">
+        <h4>Admin Login</h4>
+        <p class="mb-0">Enter your credentials to access the admin dashboard</p>
+    </div>
+    <div class="login-form">
+        {% if form.errors and not form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+        </div>
+        {% endif %}
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+        <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+            <div class="form-floating mb-3">
+                {{ form.username.errors }}
+                {{ form.username|add_class:'form-control' }}
+                <label for="id_username">{{ form.username.label }}</label>
+            </div>
+            <div class="form-floating mb-3">
+                {{ form.password.errors }}
+                {{ form.password|add_class:'form-control' }}
+                <label for="id_password">{{ form.password.label }}</label>
+                <input type="hidden" name="next" value="{{ next }}">
+            </div>
+            <button type="submit" class="btn btn-login w-100">
+                <i class="fas fa-sign-in-alt me-2"></i>{% translate 'Log in' %}
+            </button>
+        </form>
+        <div class="forgot-password mt-3">
+            {% url 'admin_password_reset' as password_reset_url %}
+            {% if password_reset_url %}
+                <a href="{{ password_reset_url }}">{% translate 'Forgotten your login credentials?' %}</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

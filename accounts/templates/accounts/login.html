@@ -2,48 +2,40 @@
 
 {% block title %}Login - Travexa{% endblock %}
 
+{% block page_title %}Login{% endblock %} 
+
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white text-center">
-                    <h3>Login to Travexa</h3>
-                </div>
-                <div class="card-body">
-                    {% if error_message %}
-                    <div class="alert alert-danger">
-                        {{ error_message }}
-                    </div>
-                    {% endif %}
-                    <form method="post" action="{% url 'accounts:login' %}">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label for="id_username" class="form-label">Username</label>
-                            <input type="text" name="username" id="id_username" class="form-control" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="id_password" class="form-label">Password</label>
-                            <input type="password" name="password" id="id_password" class="form-control" required>
-                        </div>
+<div class="auth-card">
+    <div class="card-header bg-primary text-white text-center">
+        <h3>Login to Travexa</h3>
+    </div>
+    <div class="card-body">
+        <form method="post" action="{% url 'accounts:login' %}">
+            {% csrf_token %}
 
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                            <label class="form-check-label" for="remember">Remember me</label>
-                        </div>
-
-                        <!-- Add a hidden next field to redirect after login -->
-                        <input type="hidden" name="next" value="{{ next|default:'/dashboard/' }}">
-
-                        <button type="submit" class="btn btn-primary w-100">Login</button>
-                    </form>
-                    <div class="mt-3 text-center">
-                        <a href="{% url 'accounts:register' %}">Don't have an account? Register</a>
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label for="id_username" class="form-label">Username</label>
+                <input type="text" name="username" id="id_username" class="form-control" required>
             </div>
+
+            <div class="mb-3">
+                <label for="id_password" class="form-label">Password</label>
+                <input type="password" name="password" id="id_password" class="form-control" required>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input rounded" id="remember" name="remember">
+                <label class="form-check-label" for="remember">Remember me</label>
+            </div>
+
+            <input type="hidden" name="next" value="{{ next|default:'/accounts/dashboard/' }}">
+
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+        <div class="mt-3 text-center">
+            <a href="{% url 'accounts:register' %}" class="text-primary text-decoration-none fw-semibold">Don't have an account? Register</a>
+            <br>
+            <a href="{% url 'accounts:password_reset' %}" class="text-muted text-decoration-none small mt-2 d-inline-block">Forgot password?</a>
         </div>
     </div>
 </div>

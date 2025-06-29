@@ -9,7 +9,7 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1>My Reviews</h1>
-                <a href="{% url 'user_dashboard' %}" class="btn btn-outline-primary">
+                <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary">
                     <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
                 </a>
             </div>
@@ -74,7 +74,7 @@
             {% else %}
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>You haven't written any reviews yet. 
-                    <a href="{% url 'tour_list' %}" class="alert-link">Browse tours</a> and share your experiences!
+                    <a href="{% url 'accounts:tour_list' %}" class="alert-link">Browse tours</a> and share your experiences!
                 </div>
             {% endif %}
         </div>

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile - Travexa{% endblock %}
+{% block extra_head %}
+<style>
+    :root {
+        --primary-color: #16a34a;
+        --primary-hover: #15803d;
+        --secondary-color: #bbf7d0;
+        --card-bg: #f0f9f0;
+        --card-radius: 12px;
+        --card-shadow: 0 4px 6px rgba(22, 163, 74, 0.08);
+    }
+    .dashboard-card {
+        background: var(--card-bg);
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
+        border: none;
+        max-width: 100%;
+        width: 100%;
+    }
+    .dashboard-btn-primary {
+        background: var(--primary-color);
+        color: #fff;
+        border: none;
+    }
+    .dashboard-btn-primary:hover {
+        background: var(--primary-hover);
+        color: #fff;
+    }
+    .dashboard-btn-secondary {
+        background: #fff;
+        color: var(--primary-color);
+        border: 1px solid var(--secondary-color);
+    }
+    .dashboard-btn-secondary:hover {
+        background: var(--secondary-color);
+        color: var(--primary-hover);
+    }
+    @media (max-width: 600px) {
+        .dashboard-card {
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+        .container.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Edit Profile</h2>
+    <div class="card dashboard-card mx-auto" style="max-width: 600px;">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% if user_form.non_field_errors %}
+                    <div class="alert alert-danger">{{ user_form.non_field_errors }}</div>
+                {% endif %}
+                {% if profile_form.non_field_errors %}
+                    <div class="alert alert-danger">{{ profile_form.non_field_errors }}</div>
+                {% endif %}
+                <div class="mb-3">
+                    {{ user_form.username.label_tag }}
+                    {{ user_form.username }}
+                    {% for error in user_form.username.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ user_form.email.label_tag }}
+                    {{ user_form.email }}
+                    {% for error in user_form.email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ profile_form.phone.label_tag }}
+                    {{ profile_form.phone }}
+                    {% for error in profile_form.phone.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ profile_form.address.label_tag }}
+                    {{ profile_form.address }}
+                    {% for error in profile_form.address.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ profile_form.profile_picture.label_tag }}
+                    {{ profile_form.profile_picture }}
+                    {% for error in profile_form.profile_picture.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                <button type="submit" class="btn dashboard-btn-primary">Save Changes</button>
+                <a href="{% url 'accounts:profile' %}" class="btn dashboard-btn-secondary ms-2">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

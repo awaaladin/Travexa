@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Travexa Admin - {{ add|yesno:_('Add %s,Change %s')|format:opts.verbose_name }}{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="display-5 fw-bold text-success">{{ add|yesno:_('Add %s,Change %s')|format:opts.verbose_name }}</h1>
+    <div class="bg-white rounded shadow-sm p-4">
+        {{ block.super }}
+    </div>
+</div>
+{% endblock %} 

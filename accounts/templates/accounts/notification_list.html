@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Notifications - Travexa{% endblock %}
+{% block extra_head %}
+<style>
+    :root {
+        --primary-color: #16a34a;
+        --primary-hover: #15803d;
+        --secondary-color: #bbf7d0;
+        --card-bg: #f0f9f0;
+        --card-radius: 12px;
+        --card-shadow: 0 4px 6px rgba(22, 163, 74, 0.08);
+    }
+    .dashboard-card {
+        background: var(--card-bg);
+        border-radius: var(--card-radius);
+        box-shadow: var(--card-shadow);
+        border: none;
+        margin-bottom: 1rem;
+        max-width: 100%;
+        width: 100%;
+    }
+    .dashboard-badge {
+        background: var(--primary-color);
+        color: #fff;
+        border-radius: 8px;
+        padding: 0.25em 0.75em;
+        font-size: 0.9em;
+    }
+    @media (max-width: 600px) {
+        .dashboard-card {
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+        .container.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Notifications</h2>
+    <div class="list-group">
+        {% for notification in notifications %}
+        <div class="card dashboard-card list-group-item d-flex justify-content-between align-items-start {% if not notification.read %}bg-light{% endif %}">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">{{ notification.title }}</div>
+                <div class="small text-muted">{{ notification.get_type_display }}</div>
+                <div>{{ notification.message }}</div>
+                {% if notification.link %}
+                <a href="{{ notification.link }}" class="btn btn-link btn-sm p-0">View Details</a>
+                {% endif %}
+            </div>
+            <span class="dashboard-badge">{{ notification.created_at|date:"M d, Y H:i" }}</span>
+        </div>
+        {% empty %}
+        <p class="text-muted">You have no notifications.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

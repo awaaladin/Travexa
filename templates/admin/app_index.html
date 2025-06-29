@@ -1,0 +1,29 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Travexa Admin - {{ app_config.verbose_name }}{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="display-5 fw-bold text-success">{{ app_config.verbose_name }}</h1>
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="bg-white rounded shadow-sm p-4">
+                <h5 class="mb-3 text-success">Models</h5>
+                {% if app_list %}
+                    <div class="list-group">
+                        {% for model in app_list.0.models %}
+                            <div class="mb-2">
+                                <a href="{{ model.admin_url }}" class="fw-semibold">{{ model.name }}</a>
+                                <span class="ms-2">
+                                    {% if model.add_url %}<a href="{{ model.add_url }}" class="btn btn-sm btn-outline-success">Add</a>{% endif %}
+                                    <a href="{{ model.admin_url }}" class="btn btn-sm btn-outline-primary">Change</a>
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No models are available for this app.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -3,9 +3,9 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import AbstractUser
 import uuid
 
+# --- Custom User ---
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
         ('customer', 'Customer'),
@@ -106,6 +106,7 @@ class Booking(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     special_requests = models.TextField(blank=True)
+    notes = models.TextField(blank=True, null=True)  # optional notes field
 
     def __str__(self):
         return f"Booking {self.booking_id} - {self.user.username} - {self.tour.title}"
@@ -123,7 +124,9 @@ class Booking(models.Model):
 # --- Payment Model ---
 class Payment(models.Model):
     PAYMENT_METHOD_CHOICES = (
-        ('stripe', 'Credit/Debit Card'),
+        ('card', 'Credit/Debit Card'),
+        ('bank_transfer', 'Bank Transfer'),
+        ('cash', 'Cash'),
     )
 
     STATUS_CHOICES = (
@@ -144,54 +147,192 @@ class Payment(models.Model):
         return f"Payment for Booking {self.booking.booking_id} - {self.amount}"
 
     def process_payment(self, payment_details):
-        import stripe
-        from django.conf import settings
-        stripe.api_key = settings.STRIPE_SECRET_KEY
+        """Process a payment with the given details."""
         try:
-            payment_intent = stripe.PaymentIntent.create(
-                amount=int(self.amount * 100),
-                currency='usd',
-                payment_method=payment_details.get('payment_method_id'),
-                confirm=True,
-                description=f"Payment for booking {self.booking.booking_id}",
-                metadata={
-                    'booking_id': str(self.booking.booking_id),
-                    'user_email': self.booking.user.email,
-                    'tour_name': self.booking.tour.title
-                }
-            )
-            self.transaction_id = payment_intent.id
+            # TODO: Implement payment processing logic based on payment_method
             self.status = 'completed'
             self.save()
             self.booking.status = 'confirmed'
             self.booking.save()
             return True
-        except stripe.error.CardError:
-            self.status = 'failed'
-            self.save()
-            return False
-        except (stripe.error.RateLimitError, 
-                stripe.error.InvalidRequestError, 
-                stripe.error.AuthenticationError,
-                stripe.error.APIConnectionError,
-                stripe.error.StripeError):
+        except Exception:
             self.status = 'failed'
             self.save()
             return False
 
     def issue_refund(self):
-        if self.status == 'completed' and self.transaction_id:
-            import stripe
-            from django.conf import settings
-            stripe.api_key = settings.STRIPE_SECRET_KEY
+        """Issue a refund for the payment."""
+        if self.status == 'completed':
             try:
-                stripe.Refund.create(
-                    payment_intent=self.transaction_id,
-                    reason='requested_by_customer'
-                )
+                # TODO: Implement refund logic based on payment_method
                 self.status = 'refunded'
                 self.save()
                 return True
-            except stripe.error.StripeError:
+            except Exception:
                 return False
         return False
+
+# --- Booking Report ---
+class BookingReport(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    report_type = models.CharField(max_length=100)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    total_bookings = models.PositiveIntegerField(default=0)
+    completed_bookings = models.PositiveIntegerField(default=0)
+    cancelled_bookings = models.PositiveIntegerField(default=0)
+    pending_bookings = models.PositiveIntegerField(default=0)
+    average_booking_value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+# --- Revenue Report ---
+class RevenueReport(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    report_type = models.CharField(max_length=100)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    total_revenue = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    refunded_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    net_revenue = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    most_profitable_tour = models.CharField(max_length=255, blank=True, null=True)
+    most_profitable_tour_revenue = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+# --- User Growth Report ---
+class UserGrowthReport(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    report_type = models.CharField(max_length=100)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    new_users = models.PositiveIntegerField(default=0)
+    active_users = models.PositiveIntegerField(default=0)
+    inactive_users = models.PositiveIntegerField(default=0)
+    user_growth_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    new_tour_operators = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+# --- Review Model ---
+class Review(models.Model):
+    RATING_CHOICES = (
+        (1, '1 Star'),
+        (2, '2 Stars'),
+        (3, '3 Stars'),
+        (4, '4 Stars'),
+        (5, '5 Stars'),
+    )
+    
+    tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='reviews')
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Review by {self.customer.username} for {self.tour.title}"
+
+# --- Notification Model ---
+class Notification(models.Model):
+    NOTIFICATION_TYPES = (
+        ('booking', 'Booking'),
+        ('review', 'Review'),
+        ('system', 'System'),
+        ('payment', 'Payment'),
+    )
+
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    link = models.URLField(blank=True, null=True)  # Optional link to relevant page
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Notification for {self.recipient.username}: {self.title}"
+
+# --- Admin Report ---
+class AdminReport(models.Model):
+    REPORT_TYPES = (
+        ('revenue', 'Revenue Report'),
+        ('user_activity', 'User Activity Report'),
+        ('tour_performance', 'Tour Performance Report'),
+        ('custom', 'Custom Report'),
+    )
+    
+    title = models.CharField(max_length=200)
+    report_type = models.CharField(max_length=20, choices=REPORT_TYPES)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_reports')
+    created_at = models.DateTimeField(auto_now_add=True)
+    data = models.JSONField()  # Stores the report data in JSON format
+    notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.get_report_type_display()} - {self.title}"
+
+# --- User Activity Report ---
+class UserActivityReport(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='activity_reports')
+    login_count = models.IntegerField(default=0)
+    bookings_made = models.IntegerField(default=0)
+    reviews_written = models.IntegerField(default=0)
+    total_spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    report_period = models.DateField()  # The date this report represents
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-report_period']
+        unique_together = ['user', 'report_period']
+
+    def __str__(self):
+        return f"Activity Report for {self.user.username} - {self.report_period}"
+
+# --- Tour Performance Report ---
+class TourPerformanceReport(models.Model):
+    tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='performance_reports')
+    bookings_count = models.IntegerField(default=0)
+    revenue = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+    report_period = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-report_period']
+        unique_together = ['tour', 'report_period']
+
+    def __str__(self):
+        return f"Performance Report for {self.tour.title} - {self.report_period}"
