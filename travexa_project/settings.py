@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-xn7=dw0m9va7m_)8fba(=v4v(-xz&vb$wx+=b^zcq(9*^nhl8w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['travexa.onrender.com']
 
 
 # Application definition
