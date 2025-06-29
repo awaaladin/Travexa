@@ -126,9 +126,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Authentication settings
-LOGIN_URL = 'login'  # Where to redirect if user is not logged in
-LOGIN_REDIRECT_URL = 'dashboard'  # Where to redirect after successful login
-LOGOUT_REDIRECT_URL = 'login'  # Where to redirect after logout
+LOGIN_URL = 'accounts:login'  
+LOGIN_REDIRECT_URL = 'dashboard'  
+LOGOUT_REDIRECT_URL = 'accounts:login'  
 
 
 
